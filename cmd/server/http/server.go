@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/instabledesign/go-skeleton/cmd/server/http/handler"
-	"github.com/instabledesign/go-skeleton/internal"
+	"github.com/instabledesign/go-skeleton/cmd/server/service"
 )
 
 type Server struct {
@@ -32,9 +32,9 @@ func (s *Server) Stop() error {
 	return nil
 }
 
-func NewServer(app *app.App) *Server {
+func NewServer(container *service.Container) *Server {
 	return &Server{
-		httpServer: &http.Server{Addr: app.Cfg.HTTPAddr, Handler: getHttpHandler(app)},
+		httpServer: &http.Server{Addr: container.Cfg.HTTPAddr, Handler: getHttpHandler(container)},
 	}
 }
 
@@ -42,9 +42,9 @@ func Healthz(response http.ResponseWriter, _ *http.Request) {
 	response.WriteHeader(http.StatusOK)
 }
 
-func getHttpHandler(app *app.App) http.Handler {
+func getHttpHandler(container *service.Container) http.Handler {
 	r := mux.NewRouter()
-	r.Use(handlers.RecoveryHandler(handlers.PrintRecoveryStack(app.Cfg.Debug)))
+	r.Use(handlers.RecoveryHandler(handlers.PrintRecoveryStack(container.Cfg.Debug)))
 
 	r.Path("/route-example").Methods("GET").HandlerFunc(handler.RouteExample())
 
@@ -52,7 +52,7 @@ func getHttpHandler(app *app.App) http.Handler {
 	r.Path("/liveness").HandlerFunc(Healthz)
 	r.Path("/readiness").HandlerFunc(Healthz)
 
-	if app.Cfg.PprofEnable {
+	if container.Cfg.PprofEnable {
 		// PPROF
 		r.HandleFunc("/debug/pprof/", pprof.Index)
 		r.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)

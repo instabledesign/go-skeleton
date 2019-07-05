@@ -2,10 +2,11 @@ package grpc
 
 import (
 	"context"
-	"github.com/instabledesign/go-skeleton/internal"
+	"net"
+
+	"github.com/instabledesign/go-skeleton/cmd/server/service"
 	"github.com/instabledesign/go-skeleton/internal/grpc/calc/pb"
 	"google.golang.org/grpc"
-	"net"
 )
 
 type Server struct {
@@ -13,10 +14,10 @@ type Server struct {
 	GRPCPort string
 }
 
-func NewServer(app *app.App) *Server {
+func NewServer(container *service.Container) *Server {
 	s := &Server{
 		server:   grpc.NewServer(),
-		GRPCPort: app.Cfg.GRPCPort,
+		GRPCPort: container.Cfg.GRPCPort,
 	}
 	calc.RegisterCalcServer(s.server, s)
 
