@@ -10,6 +10,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/instabledesign/go-skeleton/cmd/server/http/handler"
 	"github.com/instabledesign/go-skeleton/cmd/server/service"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/slok/go-http-metrics/metrics/prometheus"
+	"github.com/slok/go-http-metrics/middleware"
 )
 
 type Server struct {
@@ -44,11 +47,21 @@ func Healthz(response http.ResponseWriter, _ *http.Request) {
 
 func getHttpHandler(container *service.Container) http.Handler {
 	r := mux.NewRouter()
-	r.Use(handlers.RecoveryHandler(handlers.PrintRecoveryStack(container.Cfg.Debug)))
+	httpMetricsMiddleware := middleware.New(middleware.Config{
+		GroupedStatus: true,
+		Recorder:      prometheus.NewRecorder(prometheus.Config{}),
+	})
+	r.Use(
+		handlers.RecoveryHandler(handlers.PrintRecoveryStack(container.Cfg.Debug)),
+		// Caution for next middleware if you have a lote of route or dynamic url (that count of unique route)
+		// you should put this middleware over each handler you want to monitor
+		func(i http.Handler) http.Handler { return httpMetricsMiddleware.Handler("", i) },
+	)
 
 	r.Path("/route-example").Methods("GET").HandlerFunc(handler.RouteExample())
 
 	// TOOLING
+	r.Path("/metrics").Handler(promhttp.Handler())
 	r.Path("/liveness").HandlerFunc(Healthz)
 	r.Path("/readiness").HandlerFunc(Healthz)
 

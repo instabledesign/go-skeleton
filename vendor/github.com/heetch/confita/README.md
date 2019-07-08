@@ -11,6 +11,7 @@ Confita is a library that loads configuration from multiple backends and stores 
 - Environment variables
 - JSON files
 - Yaml files
+- Toml files
 - Command line flags
 - [etcd](https://github.com/coreos/etcd)
 - [Consul](https://www.consul.io/)
@@ -58,6 +59,7 @@ type Config struct {
   Database struct {
     URI string              `config:"database-uri,required"`
   }
+}
 ```
 
 If a field is a slice, Confita will automatically split the config value by commas and fill the slice with each sub value.

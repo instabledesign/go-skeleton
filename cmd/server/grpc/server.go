@@ -4,9 +4,11 @@ import (
 	"context"
 	"net"
 
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/instabledesign/go-skeleton/cmd/server/service"
 	"github.com/instabledesign/go-skeleton/internal/grpc/calc/pb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type Server struct {
@@ -16,10 +18,16 @@ type Server struct {
 
 func NewServer(container *service.Container) *Server {
 	s := &Server{
-		server:   grpc.NewServer(),
+		server:   grpc.NewServer(
+			grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
+			grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
+		),
 		GRPCPort: container.Cfg.GRPCPort,
 	}
 	calc.RegisterCalcServer(s.server, s)
+	reflection.Register(s.server)
+	grpc_prometheus.EnableHandlingTimeHistogram()
+	grpc_prometheus.Register(s.server)
 
 	return s
 }

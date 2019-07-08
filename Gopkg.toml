@@ -30,5 +30,30 @@
   unused-packages = true
 
 [[constraint]]
+  name = "github.com/golang/protobuf"
+  version = "1.0.0"
+
+[[constraint]]
   name = "github.com/processout/grpc-go-pool"
   version = "1.2.1"
+
+[[constraint]]
+  name = "google.golang.org/grpc"
+  version = "1.11.2"
+
+[[constraint]]
+  name = "github.com/prometheus/client_golang"
+  version = "0.8.0"
+
+[[constraint]]
+  name = "github.com/slok/go-http-metrics"
+  version = "0.4.0"
+
+[[constraint]]
+  name = "github.com/grpc-ecosystem/go-grpc-prometheus"
+  version = "1.1.0"
+
+[[constraint]]
+  name = "github.com/grpc-ecosystem/grpc-gateway"
+  version = "1.4.1"
+
