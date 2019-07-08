@@ -1,15 +1,16 @@
 package main
 
 import (
-	"google.golang.org/grpc"
 	"net/http"
 	"os"
+	"syscall"
 
 	grpcSrv "github.com/instabledesign/go-skeleton/cmd/server/grpc"
 	httpSrv "github.com/instabledesign/go-skeleton/cmd/server/http"
 	"github.com/instabledesign/go-skeleton/cmd/server/service"
 	"github.com/instabledesign/go-skeleton/configs"
 	"github.com/instabledesign/go-skeleton/pkg/signal"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -35,7 +36,7 @@ func main() {
 		if err := container.Unload(); err != nil {
 			println(err)
 		}
-	})()
+	}, os.Interrupt, os.Kill, syscall.SIGTERM)()
 
 	// starting servers
 	go func() {

@@ -35,6 +35,6 @@ func fprint(w io.Writer, iface interface{}) {
 		}
 
 		typeField := value.Type().Field(i)
-		fmt.Fprintf(w, "%value\t\033[0m%v\t\033[1;34m%value\033[0m \033[1;92m`%value`\033[0m\n", typeField.Name, field.Interface(), field.Type().String(), typeField.Tag)
+		fmt.Fprintf(w, "%s\t\033[0m%v\t\033[1;34m%s\033[0m \033[1;92m`%s`\033[0m\n", typeField.Name, field.Interface(), field.Type().String(), typeField.Tag)
 	}
 }
