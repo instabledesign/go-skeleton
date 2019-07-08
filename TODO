@@ -1,9 +1,0 @@
-components
-    CLI
-        arguments/options
-        color
-        formattage
-
-    process
-    logger
-    worker
