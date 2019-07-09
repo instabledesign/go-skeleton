@@ -41,10 +41,19 @@ func NewServer(container *service.Container) *Server {
 	}
 }
 
-func Healthz(response http.ResponseWriter, _ *http.Request) {
+func Liveness(response http.ResponseWriter, _ *http.Request) {
+	// return the service state
+	// you must return http.StatusOK when the service is operational
 	response.WriteHeader(http.StatusOK)
 }
 
+func Readiness(response http.ResponseWriter, _ *http.Request) {
+	// you must return http.StatusOK when your service is ready to work
+	// database check, index creation all prérequired action must be check before readiness
+	response.WriteHeader(http.StatusOK)
+}
+
+// init and configure your http handler
 func getHttpHandler(container *service.Container) http.Handler {
 	r := mux.NewRouter()
 	httpMetricsMiddleware := middleware.New(middleware.Config{
@@ -62,8 +71,8 @@ func getHttpHandler(container *service.Container) http.Handler {
 
 	// TOOLING
 	r.Path("/metrics").Handler(promhttp.Handler())
-	r.Path("/liveness").HandlerFunc(Healthz)
-	r.Path("/readiness").HandlerFunc(Healthz)
+	r.Path("/liveness").HandlerFunc(Liveness)
+	r.Path("/readiness").HandlerFunc(Readiness)
 
 	if container.Cfg.PprofEnable {
 		// PPROF
