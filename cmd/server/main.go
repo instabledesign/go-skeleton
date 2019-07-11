@@ -7,15 +7,15 @@ import (
 
 	grpcSrv "github.com/instabledesign/go-skeleton/cmd/server/grpc"
 	httpSrv "github.com/instabledesign/go-skeleton/cmd/server/http"
-	"github.com/instabledesign/go-skeleton/cmd/server/service"
-	"github.com/instabledesign/go-skeleton/configs"
+	"github.com/instabledesign/go-skeleton/config"
+	"github.com/instabledesign/go-skeleton/internal/service"
 	"github.com/instabledesign/go-skeleton/pkg/signal"
 	"google.golang.org/grpc"
 )
 
 func main() {
 	// example loading config
-	cfg := configs.NewServerConfig()
+	cfg := config.NewServer()
 
 	// creating your service container
 	container := service.NewContainer(cfg)

@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/instabledesign/go-skeleton/cmd/server/http/handler"
-	"github.com/instabledesign/go-skeleton/cmd/server/service"
+	"github.com/instabledesign/go-skeleton/internal/service"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/slok/go-http-metrics/metrics/prometheus"
 	"github.com/slok/go-http-metrics/middleware"
@@ -67,7 +67,8 @@ func getHttpHandler(container *service.Container) http.Handler {
 		func(i http.Handler) http.Handler { return httpMetricsMiddleware.Handler("", i) },
 	)
 
-	r.Path("/route-example").Methods("GET").HandlerFunc(handler.RouteExample())
+	r.Path("/documents/create").Methods("GET").HandlerFunc(handler.Create(container.GetDocumentRepository()))
+	r.Path("/documents").Methods("GET").HandlerFunc(handler.List(container.GetDocumentRepository()))
 
 	// TOOLING
 	r.Path("/metrics").Handler(promhttp.Handler())

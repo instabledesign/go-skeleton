@@ -2,11 +2,14 @@ package grpc
 
 import (
 	"context"
+	"log"
 	"net"
 
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/instabledesign/go-skeleton/cmd/server/service"
-	"github.com/instabledesign/go-skeleton/internal/grpc/calc/pb"
+	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/instabledesign/go-skeleton/internal/service"
+	"github.com/instabledesign/go-skeleton/pkg/my_package/data_transformer"
+	protos "github.com/instabledesign/go-skeleton/pkg/my_package/protos"
+	"github.com/instabledesign/go-skeleton/pkg/my_package/repository"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -14,17 +17,20 @@ import (
 type Server struct {
 	server   *grpc.Server
 	GRPCPort string
+
+	documentRepository repository.DocumentRepository
 }
 
 func NewServer(container *service.Container) *Server {
 	s := &Server{
-		server:   grpc.NewServer(
+		server: grpc.NewServer(
 			grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 			grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
 		),
-		GRPCPort: container.Cfg.GRPCPort,
+		GRPCPort:           container.Cfg.GRPCPort,
+		documentRepository: container.GetDocumentRepository(),
 	}
-	calc.RegisterCalcServer(s.server, s)
+	protos.RegisterMyPackageServer(s.server, s)
 	reflection.Register(s.server)
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	grpc_prometheus.Register(s.server)
@@ -50,6 +56,34 @@ func (s *Server) Stop() error {
 	return nil
 }
 
-func (s *Server) Operation(ctx context.Context, req *calc.MyRequest) (*calc.MyResponse, error) {
-	return &calc.MyResponse{Result: 345}, nil
+func (s *Server) Store(ctx context.Context, req *protos.StoreRequest) (*protos.StoreResponse, error) {
+	return &protos.StoreResponse{}, nil
+}
+
+func (s *Server) Find(req *protos.FindRequest, findSrv protos.MyPackage_FindServer) error {
+	ctx := findSrv.Context()
+
+	documents, err := s.documentRepository.Find(ctx)
+	if err != nil {
+		return err
+	}
+	if documents == nil || len(documents) == 0 {
+		return findSrv.Send(nil)
+	}
+	for _, document := range documents {
+		select {
+		case <-ctx.Done():
+			log.Printf("\tclient close connection before EOF: %s\n", ctx.Err())
+			return ctx.Err()
+		default:
+			resp := &protos.FindResponse{
+				Document: data_transformer.TransformDocument(document),
+			}
+
+			if err := findSrv.Send(resp); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

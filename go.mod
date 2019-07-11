@@ -1,12 +1,15 @@
 module github.com/instabledesign/go-skeleton
 
 require (
+	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/golang/protobuf v1.3.1
 	github.com/gorilla/handlers v1.4.0
 	github.com/gorilla/mux v1.7.3
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/heetch/confita v0.6.0
 	github.com/joho/godotenv v1.3.0
+	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
+	github.com/olivere/elastic v6.2.21+incompatible
 	github.com/pkg/errors v0.8.1
 	github.com/processout/grpc-go-pool v1.2.1
 	github.com/prometheus/client_golang v1.0.0

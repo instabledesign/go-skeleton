@@ -12,6 +12,8 @@ import (
 	"github.com/instabledesign/go-skeleton/pkg/config/dotenv"
 )
 
+var DefaultConfigBuilder = NewDefaultConfigBuilder()
+
 type Builder struct {
 	backends []backend.Backend
 }
@@ -46,6 +48,14 @@ func (cb *Builder) LoadOrFatal(ctx context.Context, to interface{}) {
 
 func NewConfigBuilder(backends ...backend.Backend) *Builder {
 	return &Builder{backends: append([]backend.Backend{}, backends...)}
+}
+
+func Load(ctx context.Context, to interface{}) error {
+	return DefaultConfigBuilder.Load(ctx, to)
+}
+
+func LoadOrFatal(ctx context.Context, to interface{}) {
+	DefaultConfigBuilder.LoadOrFatal(ctx, to)
 }
 
 /*
