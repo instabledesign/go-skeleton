@@ -6,13 +6,11 @@ import (
 	"net/http/pprof"
 	"time"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/instabledesign/go-skeleton/cmd/server/http/handler"
+	middleware2 "github.com/instabledesign/go-skeleton/cmd/server/http/middleware"
 	"github.com/instabledesign/go-skeleton/internal/service"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/slok/go-http-metrics/metrics/prometheus"
-	"github.com/slok/go-http-metrics/middleware"
 )
 
 type Server struct {
@@ -56,15 +54,9 @@ func Readiness(response http.ResponseWriter, _ *http.Request) {
 // init and configure your http handler
 func getHttpHandler(container *service.Container) http.Handler {
 	r := mux.NewRouter()
-	httpMetricsMiddleware := middleware.New(middleware.Config{
-		GroupedStatus: true,
-		Recorder:      prometheus.NewRecorder(prometheus.Config{}),
-	})
 	r.Use(
-		handlers.RecoveryHandler(handlers.PrintRecoveryStack(container.Cfg.Debug)),
-		// Caution for next middleware if you have a lote of route or dynamic url (that count of unique route)
-		// you should put this middleware over each handler you want to monitor
-		func(i http.Handler) http.Handler { return httpMetricsMiddleware.Handler("", i) },
+		middleware2.Recovery(container.Cfg.Debug),
+		middleware2.Prometheus(),
 	)
 
 	r.Path("/documents/create").Methods("GET").HandlerFunc(handler.Create(container.GetDocumentRepository()))

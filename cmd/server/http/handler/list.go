@@ -10,6 +10,7 @@ import (
 // View handler
 func List(repository repository.DocumentRepository) func(http.ResponseWriter, *http.Request) {
 	return func(response http.ResponseWriter, request *http.Request) {
+		panic("opppppppsss")
 		//docs, err := repository.Find(request.Context())
 		docs, err := repository.FindBy("title", "yes", request.Context())
 		if err != nil {
