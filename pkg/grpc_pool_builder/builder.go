@@ -35,7 +35,3 @@ func (b PoolBuilder) getFactory(url string) grpcpool.Factory {
 		return grpc.Dial(url, b.dialOpts...)
 	}
 }
-
-func NewPoolBuilder() PoolBuilder {
-	return PoolBuilder{}
-}

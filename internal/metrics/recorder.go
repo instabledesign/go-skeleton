@@ -3,26 +3,32 @@ package metrics
 import "github.com/prometheus/client_golang/prometheus"
 
 type Recorder struct {
-	GrpcPoolGaugeVec *prometheus.GaugeVec
+	grpcPoolGaugeVec *prometheus.GaugeVec
 }
 
-func (r *Recorder) mustRegister() *Recorder {
-	prometheus.MustRegister(
-		r.GrpcPoolGaugeVec,
+// It register all the metris on the given registerer
+// pass nil will use DefaultRegisterer
+func (r *Recorder) MustRegister(registry prometheus.Registerer) *Recorder {
+	if registry == nil {
+		registry = prometheus.DefaultRegisterer
+	}
+
+	registry.MustRegister(
+		r.grpcPoolGaugeVec,
 	)
 	return r
 }
 
 func (r *Recorder) CollectGrpcPoolState(pool *Pool) *Recorder {
 	name := pool.GetName()
-	r.GrpcPoolGaugeVec.WithLabelValues(name, "capacity").Set(float64(pool.Capacity()))
-	r.GrpcPoolGaugeVec.WithLabelValues(name, "available").Set(float64(pool.Available()))
+	r.grpcPoolGaugeVec.WithLabelValues(name, "capacity").Set(float64(pool.Capacity()))
+	r.grpcPoolGaugeVec.WithLabelValues(name, "available").Set(float64(pool.Available()))
 	return r
 }
 
 func NewRecorder(namespace string) *Recorder {
-	return (&Recorder{
-		GrpcPoolGaugeVec: prometheus.NewGaugeVec(
+	return &Recorder{
+		grpcPoolGaugeVec: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
 				Subsystem: "grpc_pool",
@@ -31,5 +37,5 @@ func NewRecorder(namespace string) *Recorder {
 			},
 			[]string{"service", "type"},
 		),
-	}).mustRegister()
+	}
 }

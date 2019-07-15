@@ -10,7 +10,6 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
 	github.com/olivere/elastic v6.2.21+incompatible
-	github.com/pkg/errors v0.8.1
 	github.com/processout/grpc-go-pool v1.2.1
 	github.com/prometheus/client_golang v1.0.0
 	github.com/prometheus/common v0.6.0 // indirect

@@ -12,8 +12,7 @@ type Pool struct {
 	name     string
 	recorder *Recorder
 
-	done     chan struct{}
-	interval *time.Ticker
+	stopCollectMetrics chan struct{}
 }
 
 func (p *Pool) GetName() string {
@@ -21,26 +20,26 @@ func (p *Pool) GetName() string {
 }
 
 func (p *Pool) Close() {
-	close(p.done)
+	close(p.stopCollectMetrics)
 	p.Pool.Close()
 }
 
-func (p *Pool) CollectMetrics() {
-	p.done = make(chan struct{}, 1)
+func (p *Pool) CollectMetrics(interval *time.Ticker) {
+	p.stopCollectMetrics = make(chan struct{}, 1)
 	go func() {
 		for {
 			select {
-			case <-p.interval.C:
+			case <-interval.C:
 				p.recorder.CollectGrpcPoolState(p)
-			case <-p.done:
-				p.interval.Stop()
+			case <-p.stopCollectMetrics:
+				interval.Stop()
 				return
 			}
 		}
 	}()
 }
 
-func NewPool(name string, pool *grpcpool.Pool, rec *Recorder) *Pool {
+func NewGrpcPool(name string, pool *grpcpool.Pool, rec *Recorder) *Pool {
 	return &Pool{
 		name:     name,
 		Pool:     pool,
