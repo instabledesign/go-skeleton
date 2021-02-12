@@ -8,7 +8,7 @@ require (
 	github.com/gol4ng/httpware/v4 v4.0.0
 	github.com/gol4ng/logger v0.5.7
 	github.com/gol4ng/logger-grpc v0.2.0
-	github.com/gol4ng/logger-http v0.3.0
+	github.com/gol4ng/logger-http v0.4.0
 	github.com/gol4ng/stop-dispatcher v0.2.0
 	github.com/golang/protobuf v1.4.3
 	github.com/google/go-cmp v0.5.4 // indirect
