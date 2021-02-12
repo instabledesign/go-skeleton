@@ -2,10 +2,15 @@ package config
 
 import (
 	"time"
+
+	"github.com/gol4ng/logger"
 )
 
 type Base struct {
-	Debug             bool   `config:"debug"`
+	Debug         bool               `config:"debug"`
+	LogLevel      logger.LevelString `config:"log_level"`
+	LogCliVerbose bool               `config:"log_cli_verbose"`
+
 	DocumentIndexName string `config:"document_index_name"`
 
 	ElasticURL            string        `config:"elastic_url"`

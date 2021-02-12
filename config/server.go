@@ -2,7 +2,9 @@ package config
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/gol4ng/logger"
 	"github.com/instabledesign/go-skeleton/pkg/config"
 )
 
@@ -10,19 +12,24 @@ import (
 type Server struct {
 	PprofEnable bool   `config:"pprof"`
 	HTTPAddr    string `config:"http_addr"`
-	GRPCPort    string `config:"grpc_port"`
+	GRPCAddr    string `config:"grpc_addr"`
 }
 
 func NewServer() *Base {
 	cfg := &Base{
-		Debug: true,
+		Debug:         true,
+		LogCliVerbose: false,
+		LogLevel:      logger.LevelString(logger.InfoLevel.String()),
+
 		//Default value here
 		Server: Server{
 			HTTPAddr: "localhost:8001",
-			GRPCPort: "8002",
+			GRPCAddr: "localhost:8002",
 		},
 	}
 
 	config.LoadOrFatal(context.Background(), cfg)
+	fmt.Println(config.ToString(cfg))
+
 	return cfg
 }

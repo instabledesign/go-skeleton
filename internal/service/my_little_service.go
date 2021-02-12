@@ -1,9 +1,16 @@
 package service
 
+import (
+	"sync"
+)
+
+var myLittleServiceOnce sync.Once
+
 func (container *Container) GetMyLittleService() func() {
-	if container.myLittleService == nil {
+	myLittleServiceOnce.Do(func() {
 		container.myLittleService = myLittleService
-	}
+	})
+
 	return container.myLittleService
 }
 
