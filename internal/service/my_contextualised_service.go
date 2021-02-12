@@ -6,7 +6,8 @@ import (
 
 var myContextualizedServiceKey struct{}
 
-// you need to define this kinf of service only when the service only live in context
+
+// you need to define this kind of service only when the service only live in context
 func (container *Container) GetMyContextualizedService(ctx context.Context /* you can add some service injection here*/) *MyContextualizeService {
 	if myContextualizedService, ok := ctx.Value(myContextualizedServiceKey).(*MyContextualizeService); ok {
 		return myContextualizedService
